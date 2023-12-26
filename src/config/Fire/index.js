@@ -9,7 +9,9 @@ const firebaseConfig = {
   storageBucket: 'konsultasi-dokter-5e63a.appspot.com',
   messagingSenderId: '854976333763',
   appId: '1:854976333763:web:4a50de293b61943deadf76',
+  databaseURL: "https://konsultasi-dokter-5e63a-default-rtdb.asia-southeast1.firebasedatabase.app",
 };
+
 
 export const Fire = initializeApp(firebaseConfig)
 export const Fire_Auth = getAuth(Fire)

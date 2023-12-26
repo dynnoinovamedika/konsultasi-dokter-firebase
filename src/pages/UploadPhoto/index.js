@@ -1,24 +1,38 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
 import {Button, Gap, Header, Link} from '../../components';
-import {ILNullPhoto, IcAddPhoto, IconAddPhoto} from '../../assets';
+import {ILNullPhoto, IcAddPhoto, IconAddPhoto, IconRemovePhoto} from '../../assets';
 import {colors, fonts} from '../../utils';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const UploadPhoto = ({navigation}) => {
-  return (
+  const [hasPhoto, setHasPhoto] = useState(false)
+  const [photo, setPhoto] = useState(ILNullPhoto)
+
+  const getImage = () => {
+    launchImageLibrary({}, callback => {
+      console.log(callback);
+      const source = {uri: callback.assets[0].uri}
+      setPhoto(source)
+      setHasPhoto(true)
+    });
+  }
+ 
+   return (
     <View style={styles.page}>
       <Header title="Upload Photo" onPress={() => navigation.goBack()}/>
       <View style={styles.content}>
         <View style={styles.profile}>
-          <View style={styles.avatarWrapper}>
-            <Image source={ILNullPhoto} style={styles.avatar} />
-            <Image source={IconAddPhoto} style={styles.IcAddPhoto} />
-          </View>
+          <TouchableOpacity style={styles.avatarWrapper} onPress={getImage}>
+            <Image source={photo} style={styles.avatar} />
+            {hasPhoto &&  <Image source={IconRemovePhoto} style={styles.IcAddPhoto}/>}
+            {!hasPhoto && <Image source={IconAddPhoto} style={styles.IcAddPhoto} />}
+          </TouchableOpacity>
           <Text style={styles.name}>Dynno Yohanis Ottu</Text>
           <Text style={styles.profession}>Mobile Programmer</Text>
         </View>
         <View>
-          <Button title="Upload and Continue" onPress={() => navigation.replace('MainApp')}/>
+          <Button title="Upload and Continue" onPress={() => navigation.replace('MainApp')} disable={!hasPhoto}/>
           <Gap height={30}/>
           <Link title="Skip for this" align="center" size={16} onPress={() => navigation.replace('MainApp')}/>
           <Gap height={40}/>
@@ -44,6 +58,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 110,
     height: 110,
+    borderRadius: 110/2
   },
   avatarWrapper: {
     width: 130,
