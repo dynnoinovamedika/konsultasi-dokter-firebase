@@ -1,41 +1,87 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {Button, Gap, Header, Link} from '../../components';
-import {ILNullPhoto, IcAddPhoto, IconAddPhoto, IconRemovePhoto} from '../../assets';
-import {colors, fonts} from '../../utils';
+import {
+  ILNullPhoto,
+  IcAddPhoto,
+  IconAddPhoto,
+  IconRemovePhoto,
+} from '../../assets';
+import {colors, fonts, storeData} from '../../utils';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {showMessage} from 'react-native-flash-message';
+import {getDatabase, ref, set, update} from 'firebase/database';
 
-const UploadPhoto = ({navigation}) => {
-  const [hasPhoto, setHasPhoto] = useState(false)
-  const [photo, setPhoto] = useState(ILNullPhoto)
-
+const UploadPhoto = ({navigation, route}) => {
+  const {fullName, profession, uid} = route.params;
+  const [photoForDb, setPhotoForDb] = useState('');
+  const [hasPhoto, setHasPhoto] = useState(false);
+  const [photo, setPhoto] = useState(ILNullPhoto);
   const getImage = () => {
-    launchImageLibrary({}, callback => {
-      console.log(callback);
-      const source = {uri: callback.assets[0].uri}
-      setPhoto(source)
-      setHasPhoto(true)
-    });
-  }
- 
-   return (
+    launchImageLibrary(
+      {quality: 0.3, maxWidth: 200, maxHeight: 200, includeBase64: true},
+      callback => {
+        console.log(callback);
+        if (callback.didCancel || callback.error) {
+          showMessage({
+            message: 'Oop, sepertinya anda tidak memilih fotonya',
+            type: 'default',
+            backgroundColor: colors.error,
+            color: colors.white,
+          });
+        } else {
+          setPhotoForDb(
+            `data:${callback.assets[0].type};base64, ${callback.assets[0].base64}`,
+          );
+          const source = {uri: callback.assets[0].uri};
+          setPhoto(source);
+          setHasPhoto(true);
+          console.log('Response get image', callback);
+        }
+      },
+    );
+  };
+
+  const uploadAndContinue = () => {
+    const db = getDatabase();
+    update(ref(db, 'users/' + uid + '/'), {photo: photoForDb});
+    const data = route.params;
+    data.photo = photoForDb;
+    storeData('user', data);
+    navigation.replace('MainApp');
+  };
+
+  return (
     <View style={styles.page}>
-      <Header title="Upload Photo" onPress={() => navigation.goBack()}/>
+      <Header title="Upload Photo" onPress={() => navigation.goBack()} />
       <View style={styles.content}>
         <View style={styles.profile}>
           <TouchableOpacity style={styles.avatarWrapper} onPress={getImage}>
             <Image source={photo} style={styles.avatar} />
-            {hasPhoto &&  <Image source={IconRemovePhoto} style={styles.IcAddPhoto}/>}
-            {!hasPhoto && <Image source={IconAddPhoto} style={styles.IcAddPhoto} />}
+            {hasPhoto && (
+              <Image source={IconRemovePhoto} style={styles.IcAddPhoto} />
+            )}
+            {!hasPhoto && (
+              <Image source={IconAddPhoto} style={styles.IcAddPhoto} />
+            )}
           </TouchableOpacity>
-          <Text style={styles.name}>Dynno Yohanis Ottu</Text>
-          <Text style={styles.profession}>Mobile Programmer</Text>
+          <Text style={styles.name}>{fullName}</Text>
+          <Text style={styles.profession}>{profession}</Text>
         </View>
         <View>
-          <Button title="Upload and Continue" onPress={() => navigation.replace('MainApp')} disable={!hasPhoto}/>
-          <Gap height={30}/>
-          <Link title="Skip for this" align="center" size={16} onPress={() => navigation.replace('MainApp')}/>
-          <Gap height={40}/>
+          <Button
+            title="Upload and Continue"
+            onPress={uploadAndContinue}
+            disable={!hasPhoto}
+          />
+          <Gap height={30} />
+          <Link
+            title="Skip for this"
+            align="center"
+            size={16}
+            onPress={() => navigation.replace('MainApp')}
+          />
+          <Gap height={40} />
         </View>
       </View>
     </View>
@@ -53,12 +99,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     flex: 1,
     justifyContent: 'space-between',
-    paddingBottom: 40
+    paddingBottom: 40,
   },
   avatar: {
     width: 110,
     height: 110,
-    borderRadius: 110/2
+    borderRadius: 110 / 2,
   },
   avatarWrapper: {
     width: 130,
@@ -90,6 +136,6 @@ const styles = StyleSheet.create({
   profile: {
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 });

@@ -1,5 +1,7 @@
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import { getDatabase, onValue, ref } from 'firebase/database';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { DummyDoctor1, DummyDoctor2, DummyDoctor3 } from '../../assets';
 import {
   DoctorCategory,
   Gap,
@@ -7,10 +9,57 @@ import {
   NewsItem,
   RatedDoctor,
 } from '../../components';
-import {colors, fonts} from '../../utils';
-import {DummyDoctor1, DummyDoctor2, DummyDoctor3} from '../../assets';
+import { colors, fonts } from '../../utils';
 
 const Doctor = ({navigation}) => {
+  const [news, setNews] = useState([]);
+  const [doctorCategory, setDoctorcategory] = useState([]);
+
+  useEffect(() => {
+    const db = getDatabase();
+    const dbRef = ref(db, 'news/');
+
+    const fetchData = () => {
+      const newsArray = [];
+      onValue(
+        dbRef,
+        snapshot => {
+          snapshot.forEach(childSnapshot => {
+            const childData = childSnapshot.val();
+            newsArray.push(childData);
+          });
+          setNews(newsArray);
+        },
+        {
+          onlyOnce: true,
+        },
+      );
+    };
+
+    fetchData();
+
+    // Data dokter
+    const dbDoctor = ref(db, 'doctor-category/');
+
+    const fetchDataCategoryDoctor = () => {
+      const newsArray = [];
+      onValue(
+        dbDoctor,
+        snapshot => {
+          snapshot.forEach(childSnapshot => {
+            const childData = childSnapshot.val();
+            newsArray.push(childData);
+          });
+          setDoctorcategory(newsArray);
+        },
+        {
+          onlyOnce: true,
+        },
+      );
+    };
+    fetchDataCategoryDoctor();
+  }, []);
+
   return (
     <View style={styles.page}>
       <View style={styles.content}>
@@ -26,22 +75,15 @@ const Doctor = ({navigation}) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.category}>
                 <Gap width={32} />
-                <DoctorCategory
-                  category="Dokter Umum"
-                  onPress={() => navigation.navigate('ChooseDoctor')}
-                />
-                <DoctorCategory
-                  category="Dokter Obat"
-                  onPress={() => navigation.navigate('ChooseDoctor')}
-                />
-                <DoctorCategory
-                  category="Psikiater"
-                  onPress={() => navigation.navigate('ChooseDoctor')}
-                />
-                <DoctorCategory
-                  category="Dokter Umum"
-                  onPress={() => navigation.navigate('ChooseDoctor')}
-                />
+                {doctorCategory.map(item => {
+                  return (
+                  <DoctorCategory
+                    key={item.id}
+                    category={item.category}
+                    onPress={() => navigation.navigate('ChooseDoctor')}
+                  />
+                  )
+                })}
                 <Gap width={22} />
               </View>
             </ScrollView>
@@ -69,9 +111,16 @@ const Doctor = ({navigation}) => {
 
             <Text style={styles.sectionlabel}>Good News</Text>
           </View>
-          <NewsItem />
-          <NewsItem />
-          <NewsItem />
+          {news.map(item => {
+            return (
+              <NewsItem
+                title={item.title}
+                date={item.date}
+                image={item.image}
+              />
+            );
+          })}
+
           <Gap height={30} />
         </ScrollView>
       </View>

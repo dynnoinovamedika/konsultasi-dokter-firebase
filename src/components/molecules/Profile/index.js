@@ -1,30 +1,43 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { colors, fonts } from '../../../utils'
-import { DummyUser, IconRemovePhoto } from '../../../assets'
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React from 'react';
+import {colors, fonts} from '../../../utils';
+import {DummyUser, IconRemovePhoto} from '../../../assets';
 
-const Profile = ({name, desc, isRemove}) => {
+const Profile = ({name, desc, isRemove, photo, onPress}) => {
   return (
     <View style={styles.container}>
-      <View style={styles.borderProfile}>
-        <Image source={DummyUser} style={styles.avatar} />
-        {isRemove && <Image source={IconRemovePhoto} style={styles.removePhoto}/>}
-        
-      </View>
-      {name && (
-      <View>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.profession}>{desc}</Text>
-      </View>
-       )}
-  </View>
-  )
-}
+      {!isRemove && (
+        <View style={styles.borderProfile}>
+          <Image source={photo} style={styles.avatar} />
+          {isRemove && (
+            <Image source={IconRemovePhoto} style={styles.removePhoto} />
+          )}
+        </View>
+      )}
 
-export default Profile
+      {isRemove && (
+        <TouchableOpacity style={styles.borderProfile} onPress={onPress}>
+          <Image source={photo} style={styles.avatar} />
+          {isRemove && (
+            <Image source={IconRemovePhoto} style={styles.removePhoto} />
+          )}
+        </TouchableOpacity>
+      )}
+
+      {name && (
+        <View>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.profession}>{desc}</Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+export default Profile;
 
 const styles = StyleSheet.create({
-    container: {justifyContent: 'center', alignItems: 'center'},
+  container: {justifyContent: 'center', alignItems: 'center'},
   avatar: {width: 110, height: 110, borderRadius: 110 / 2},
   borderProfile: {
     width: 130,
@@ -50,5 +63,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   removePhoto: {position: 'absolute', right: 8, bottom: 8},
-
-})
+});

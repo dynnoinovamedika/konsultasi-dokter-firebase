@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Gap, Header, Input, Loading} from '../../components';
-import {colors, useForm} from '../../utils';
-import {Fire_Auth} from '../../config/Fire';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Gap, Header, Input, Loading } from '../../components';
+import { Fire_Auth } from '../../config/Fire';
+import { colors, getData, storeData, useForm } from '../../utils';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import {getDatabase, ref, set} from 'firebase/database';
+import { showMessage } from 'react-native-flash-message';
 
 const Register = ({navigation}) => {
   const [form, setForm] = useForm({
@@ -19,10 +19,11 @@ const Register = ({navigation}) => {
 
   const [loading, setLoading] = useState(false);
 
+
   const onContinue = async () => {
     console.log(form);
-    setLoading(true);
 
+    setLoading(true);
     createUserWithEmailAndPassword(auth, form.email, form.password)
       .then(userCredential => {
         setLoading(false);
@@ -31,10 +32,13 @@ const Register = ({navigation}) => {
           fullName: form.fullName,
           profession: form.profession,
           email: form.email,
+          uid: userCredential.user.uid
         };
 
         const db = getDatabase();
         set(ref(db, 'users/' + userCredential.user.uid + '/'), data);
+        storeData("User", data)
+        navigation.navigate('UploadPhoto', data)
       })
       .catch(error => {
         const errorCode = error.code;
@@ -50,7 +54,7 @@ const Register = ({navigation}) => {
       });
   };
 
-  // onPress={() => navigation.navigate('UploadPhoto')}
+  // onPress={() => }
 
   return (
     <>

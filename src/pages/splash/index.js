@@ -1,12 +1,22 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { ILLogo } from '../../assets'
+import { Fire_Auth, auth } from '../../config/Fire'
 import { colors, fonts } from '../../utils'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const Spalsh = ({navigation}) => {
   useEffect(() =>{
-    setTimeout(() => {
-      navigation.replace('GetStarted')
+    setTimeout(() => {  
+      const auth = Fire_Auth
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const uid = user.uid;
+          navigation.replace("MainApp")
+        } else {
+          navigation.replace("GetStarted")
+        }
+      }); 
     }, 3000)
   }, [])
   return  ( 
