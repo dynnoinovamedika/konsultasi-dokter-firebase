@@ -3,25 +3,37 @@ import React from 'react';
 import {colors, fonts} from '../../../utils';
 import {DummyUser, IconRemovePhoto} from '../../../assets';
 
-const Profile = ({name, desc, isRemove, photo, onPress}) => {
+const Profile = ({name, desc, isRemove, photo, onPress, photoDocter}) => {
   return (
     <View style={styles.container}>
-      {!isRemove && (
+      {photoDocter && (
         <View style={styles.borderProfile}>
-          <Image source={photo} style={styles.avatar} />
+          <Image source={{uri: photoDocter}} style={styles.avatar} />
           {isRemove && (
             <Image source={IconRemovePhoto} style={styles.removePhoto} />
           )}
         </View>
       )}
 
-      {isRemove && (
-        <TouchableOpacity style={styles.borderProfile} onPress={onPress}>
-          <Image source={photo} style={styles.avatar} />
-          {isRemove && (
-            <Image source={IconRemovePhoto} style={styles.removePhoto} />
+      {!photoDocter && (
+        <>
+          {!isRemove && (
+            <View style={styles.borderProfile}>
+              <Image source={photo} style={styles.avatar} />
+              {isRemove && (
+                <Image source={IconRemovePhoto} style={styles.removePhoto} />
+              )}
+            </View>
           )}
-        </TouchableOpacity>
+          {isRemove && (
+            <TouchableOpacity style={styles.borderProfile} onPress={onPress}>
+              <Image source={photo} style={styles.avatar} />
+              {isRemove && (
+                <Image source={IconRemovePhoto} style={styles.removePhoto} />
+              )}
+            </TouchableOpacity>
+          )}
+        </>
       )}
 
       {name && (

@@ -3,15 +3,18 @@ import React from 'react'
 import { Button, Gap, Header, Profile, ProfileItem } from '../../components'
 import { colors } from '../../utils'
 
-const DoctorProfile = ({navigation}) => {
+const DoctorProfile = ({navigation, route}) => {
+  const dataDoctor = route.params;
+
+
   return (
     <View style={styles.page}>
     <Header title="Doctor Profile" onPress={() => navigation.goBack()} />
-    <Profile name="Nairobi Putri Hayza" desc="Dokter Anak"/>
+    <Profile name={dataDoctor.fullname} desc={dataDoctor.category} photoDocter={dataDoctor.photo}/>
     <Gap height={10} />
-    <ProfileItem label="ALumnus" value="Stikom Uyelindo, 2022"/>
-    <ProfileItem label="Tempat Praktir" value="Bandung"/>
-    <ProfileItem label="No. STR" value="039849385"/>
+    <ProfileItem label="ALumnus" value={dataDoctor.university}/>
+    <ProfileItem label="Tempat Praktir" value={dataDoctor.hospital_address}/>
+    <ProfileItem label="No. STR" value={dataDoctor.str_number}/>
     <Gap height={23}/>
     <View style={styles.action}>
       <Button

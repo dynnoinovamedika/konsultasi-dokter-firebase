@@ -3,10 +3,10 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconStar } from '../../../assets';
 import { colors, fonts } from '../../../utils';
 
-const RatedDoctor = ({onPress, name, desc, avatar}) => {
+const RatedDoctor = ({onPress, name, desc, image}) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <Image source={avatar} style={styles.avatar} />
+      <Image source={{uri: image}} style={styles.avatar} />
       <View style={styles.profile}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.category}>{desc}</Text>
